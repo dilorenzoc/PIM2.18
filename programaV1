@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+
+struct endereco
+{
+	char rua[50];
+	char bairro[20];
+	int numero;
+	char cep[12];
+	char complemento[80];	
+};
+struct cadastro
+{
+	char nome[35];
+	char rg[15];
+	int data_dia;
+	int data_mes;
+	int data_ano;
+};
+
+int main(){
+	
+	char opcao_cadastro, opcao_endereco, rg_motorista;
+	int controle_telainicial = 1;
+	
+	do { 
+	
+	printf("|---------------------------|\n");
+	printf("|    1) Passageiro          |\n");
+	printf("|                           |\n");
+	printf("|    2) Motorista           |\n");
+	printf("|                           |\n");
+	printf("|    3) Sair Programa       |\n");
+	printf("|---------------------------|\n");
+	printf("Opcao Escolhida: ");
+	scanf("%d", &opcao_cadastro);
+	
+	switch(opcao_cadastro){
+		
+		case 1:
+			printf("|---------------------------|\n");
+			printf("|    1) Cadastro            |\n");
+			printf("|                           |\n");
+			printf("|    2) Pedido Carro        |\n");
+			printf("|---------------------------|\n");
+			controle_telainicial == 0;
+			break;
+		
+		case 2:
+			printf("Favor insira o numero do seu RG");
+			scanf("%s", &rg_motorista);
+			controle_telainicial == 0;
+			break;
+		case 3:
+			printf("Fim do programa");
+			controle_telainicial == 0;
+			break;
+			
+		default :
+			printf("Valor Invalido!\n");
+			controle_telainicial == 1;
+	}
+} while (controle_telainicial=1);
+	system("Pause");
+	
+}
