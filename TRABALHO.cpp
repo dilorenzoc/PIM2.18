@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
-
+#include <string.h>
+// falta: gravar o ticket no arquivo, inserir multa e cadastrar os clientes para apresentação
 struct endereco
 {
 	char rua[50];
@@ -19,25 +20,26 @@ struct cadastro
 	int data_mes;
 	int data_ano;
 	int verific_ong;
-	int verific_motorista;
+	int verific_pagamento;
 };
 
 int main(){
 	
-   	char opcao_telainicial, rg_motorista[15];
-	int controle_telainicial = 1, opcao_cadastro,conta_idade, tempo_aluguel;
-	float valor_total, desconto_idoso, desconto_ong, desconto_total, valor_aluguel;
+	//declaracao de variaveis
+   	char opcao_telainicial, rg_motorista[15], forma_pagamento[50];
+	int controle_telainicial = 1, opcao_cadastro,conta_idade;
+	float valor_total, desconto_idoso, desconto_ong, desconto_total, valor_aluguel, tempo_aluguel;
 	struct cadastro cadastro_cliente; 
 	struct endereco endereco_cliente;
 	FILE *fp;
-    
+    //obtendo a data do sistema
     time_t mytime;
     mytime = time(NULL);
     struct tm tm = *localtime(&mytime);
     printf("Data: %d/%d/%d/\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
     
 	do { 
-	
+	//menu inicial
 		printf("|-----------------------------|\n");
 		printf("|    1) Pedido Carro          |\n");
 		printf("|                             |\n");
@@ -47,9 +49,12 @@ int main(){
 		printf("Opcao Escolhida: ");
 		scanf("%d", &opcao_telainicial);
 		fflush(stdin);
+		//limpa a tela
+		system("CLS");
 		switch(opcao_telainicial){
 			
 				case 1:
+					//cadastro cliente e pedido carro
 					fp = fopen("Cliente.txt","a");
 					if(!fp)
 					{
@@ -76,6 +81,7 @@ int main(){
 					printf("\nInforme o ano do seu Nascimento: ");
 					scanf("%d", &cadastro_cliente.data_ano);
 					fprintf( fp, "%d\t", cadastro_cliente.data_ano);
+						//calculo idade
 						if (( tm.tm_mon + 1)>= cadastro_cliente.data_mes){
 							conta_idade = ((tm.tm_year + 1900) - cadastro_cliente.data_ano);
 						} 
@@ -85,6 +91,7 @@ int main(){
 					printf("\n----------------------------------------------\n");
 					fclose(fp);
 					fflush(stdin);
+					system("CLS");
 						fp = fopen("Pedido_Carro.txt","a");
 						if(!fp)
 						{
@@ -113,36 +120,59 @@ int main(){
 						gets(endereco_cliente.complemento);
 						fprintf( fp, "Complemento: %s\n", endereco_cliente.complemento);
 						fflush(stdin);
-						printf("\nE desejavel motorista?\n1) Sim\n2) Nao\n\nOpcao Escolhida: ");
-						scanf("%d", &cadastro_cliente.verific_motorista);
+						printf("\nDefina a Forma de Pagamento:\n1) Debito \n2) Credito \n3) Dinheiro\n Escolhido: ");
+						scanf("%d", &cadastro_cliente.verific_pagamento);
+						fprintf( fp, "Forma de Pagamento: %d\n", cadastro_cliente.verific_pagamento);
 						fflush(stdin);
 						printf("\n----------------------------------------------\n");
 						printf("Digite o tempo do Aluguel em dias: ");
-						scanf("%d", &tempo_aluguel);
+						scanf("%f", &tempo_aluguel);
 						fprintf( fp, "\nTempo: %d dias", tempo_aluguel);
 						printf("\n----------------------------------------------\n");
+						fflush(stdin);
+						system("CLS");
+						//calculo desconto
 							if (cadastro_cliente.verific_ong == 1){
 								valor_aluguel = tempo_aluguel * 50;
-								desconto_ong = valor_aluguel*0,05;
-						}  
-							else if (cadastro_cliente.verific_ong == 2)
-							{
+								desconto_ong = valor_aluguel * 0.05;
+							}  
+							else{
 								valor_aluguel = tempo_aluguel * 50;
-						    }
+							}
 							if (conta_idade >= 60){
 								valor_aluguel = tempo_aluguel * 50;
-								desconto_idoso = valor_aluguel*0,1;
+								desconto_idoso = valor_aluguel* 0.1;
 							}
 							else{
 								valor_aluguel = tempo_aluguel * 50;	
 							}
 							desconto_total = desconto_idoso + desconto_ong;
 							valor_aluguel = valor_aluguel - desconto_total;
+							//verificacao de forma de pagamento
+							switch (cadastro_cliente.verific_pagamento)
+							{
+								case 1: 
+								strcpy(forma_pagamento, "Debito");
+								break;
+								
+								case 2:
+								strcpy(forma_pagamento, "Credito");
+								break;
+								
+								case 3:
+								strcpy(forma_pagamento, "Dinheiro");
+								break;
+								
+								default:
+								printf("Forma de pagamento invalida!");
+							}
+							fflush(stdin);
+							//comprovante de locacao valores
 							printf("\n----------------------------------------------\n");
 							printf("\tComprovante de Locacao\t\n");
 							printf("Valor Total Locacao: %.2f\n", valor_aluguel);
-							printf("Desconto Idoso: %.2f\n",desconto_ong);
-							printf("Desconto Idoso: %.2f",desconto_idoso);
+							printf("Desconto ONG: %.2f\n", desconto_ong);
+							printf("Desconto Idoso: %.2f", desconto_idoso);
 							printf("\n----------------------------------------------\n");
 							fp = fopen("Ticket.txt","a");
 							if(!fp)
@@ -150,16 +180,33 @@ int main(){
 							printf( "Erro na abertura do arquivo");
 							exit(0);
 							}
-							
+							system("CLS");
+							//apresentação ticket
+							printf("\n-----------------------------------------------------------\n");
+							printf("SLCAI - Sistema de Locacao de Carros Adaptados \ne Inclusivos\n");
+							printf("CNPJ: 09.157.788/0012-24\n");
+							printf("IM: 422.322\n");
+							printf("\t Recibo Provisorio de Servicos\n");
+							printf("Data: %d/%d/%d/\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+							printf("Periodo de Aluguel: %f dias\n", tempo_aluguel);
+							printf("Tarifa: R$50,00 \n");
+							printf("Descontos: \n ONG:   %.2f \n Idoso: %.2f\n", desconto_ong, desconto_idoso);
+							printf("Forma de Pagamento: %s", forma_pagamento);
+							printf("\n-----------------------------------------------------------\n");
+							printf("\t Dados do Cliente \n");
+							printf("Nome: %c \n", cadastro_cliente.nome);
+							printf("Data de Nascimento: %d/%d/%d \n",cadastro_cliente.data_dia, cadastro_cliente.data_mes, cadastro_cliente.data_ano);
+							printf("Idade: %d \n", conta_idade);
+							printf("RG: %d \n",cadastro_cliente.rg);
 						break;	
 				case 2:
 					printf("Fim Programa");
+					controle_telainicial = 1;
 					break;
 				
 				default :
 					printf("Valor Invalido!\n");
 						}
-				controle_telainicial = 0;
 			} while (controle_telainicial != 0);
 	system("Pause");	
 }
