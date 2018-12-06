@@ -3,7 +3,6 @@
 #include <conio.h>
 #include <time.h>
 #include <string.h>
-// falta: gravar o ticket no arquivo, inserir multa e cadastrar os clientes para apresentação
 struct endereco
 {
 	char rua[50];
@@ -26,7 +25,7 @@ struct cadastro
 int main(){
 	
 	//declaracao de variaveis
-   	char opcao_telainicial, rg_motorista[15], forma_pagamento[50];
+   	char opcao_telainicial, rg_motorista[15], forma_pagamento[50], pausa_ticket;
 	int controle_telainicial = 1, opcao_cadastro,conta_idade;
 	float valor_total, desconto_idoso, desconto_ong, desconto_total, valor_aluguel, tempo_aluguel;
 	struct cadastro cadastro_cliente; 
@@ -36,10 +35,12 @@ int main(){
     time_t mytime;
     mytime = time(NULL);
     struct tm tm = *localtime(&mytime);
-    printf("Data: %d/%d/%d/\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
     
 	do { 
 	//menu inicial
+		system("CLS");
+		printf("SLCAI - Sistema de Locacao de Carros Adaptados e Inclusivos\n\n");
+		printf("\tData: %d/%d/%d\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
 		printf("|-----------------------------|\n");
 		printf("|    1) Pedido Carro          |\n");
 		printf("|                             |\n");
@@ -68,8 +69,11 @@ int main(){
 					fprintf( fp, "Nome: %s\t", cadastro_cliente.nome);
 					fflush(stdin);
 					printf("\nInforme o Numero do seu RG (com pontuacao): ");
+					fflush(stdin);
 					scanf("%s", &cadastro_cliente.rg);
+					fflush(stdin);
 					fprintf( fp, "RG: %s\t", cadastro_cliente.rg);
+					fflush(stdin);
 					printf("\nPossui parceria com ONG?\n1) Sim\n2) Nao\n\nOpcao Escolhida: ");
 					scanf("%d", &cadastro_cliente.verific_ong);
 					printf("\nInforme o dia do seu Nascimento: ");
@@ -102,7 +106,7 @@ int main(){
 						printf("\n               Pedido Carro               \n");
 						printf("\nInforme o nome da sua rua: ");
 						gets(endereco_cliente.rua);
-						fprintf( fp, "Rua: %s\t", endereco_cliente.rua);
+						fprintf( fp, "\nRua: %s\t", endereco_cliente.rua);
 						fflush(stdin);
 						printf("\nInforme o seu Bairro: ");
 						gets(endereco_cliente.bairro);
@@ -127,7 +131,7 @@ int main(){
 						printf("\n----------------------------------------------\n");
 						printf("Digite o tempo do Aluguel em dias: ");
 						scanf("%f", &tempo_aluguel);
-						fprintf( fp, "\nTempo: %d dias", tempo_aluguel);
+						fprintf( fp, "\nTempo: %.0f dias\n", tempo_aluguel);
 						printf("\n----------------------------------------------\n");
 						fflush(stdin);
 						system("CLS");
@@ -167,13 +171,7 @@ int main(){
 								printf("Forma de pagamento invalida!");
 							}
 							fflush(stdin);
-							//comprovante de locacao valores
-							printf("\n----------------------------------------------\n");
-							printf("\tComprovante de Locacao\t\n");
-							printf("Valor Total Locacao: %.2f\n", valor_aluguel);
-							printf("Desconto ONG: %.2f\n", desconto_ong);
-							printf("Desconto Idoso: %.2f", desconto_idoso);
-							printf("\n----------------------------------------------\n");
+							fclose(fp);
 							fp = fopen("Ticket.txt","a");
 							if(!fp)
 							{
@@ -182,26 +180,46 @@ int main(){
 							}
 							system("CLS");
 							//apresentação ticket
+							fflush(stdin);
 							printf("\n-----------------------------------------------------------\n");
 							printf("SLCAI - Sistema de Locacao de Carros Adaptados \ne Inclusivos\n");
 							printf("CNPJ: 09.157.788/0012-24\n");
 							printf("IM: 422.322\n");
 							printf("\t Recibo Provisorio de Servicos\n");
 							printf("Data: %d/%d/%d/\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
-							printf("Periodo de Aluguel: %f dias\n", tempo_aluguel);
+							fprintf( fp, "Data: %d/%d/%d\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+							printf("Periodo de Aluguel: %.0f dias\n", tempo_aluguel);
+							fprintf( fp, "Tempo Aluguel: %.0f\n", tempo_aluguel);
 							printf("Tarifa: R$50,00 \n");
-							printf("Descontos: \n ONG:   %.2f \n Idoso: %.2f\n", desconto_ong, desconto_idoso);
+							fflush(stdin);
+							printf("Descontos em Porcentagem:\n Idoso: 10 \n ONG: 5 \n");
 							printf("Forma de Pagamento: %s", forma_pagamento);
+							fprintf( fp, "\nForma de Pagamento: %s\n\n", forma_pagamento);
 							printf("\n-----------------------------------------------------------\n");
+							printf("\tComprovante de Locacao\t\n");
+							printf("Valor Total Locacao: %.2f\n", valor_aluguel);
+							printf("Desconto ONG: %.2f\n", desconto_ong);
+							printf("Desconto Idoso: %.2f", desconto_idoso);
+							printf("\nEm caso de atraso: R$20,00 (dia)");
+							printf("\n-----------------------------------------------------------\n");
+							fflush(stdin);
 							printf("\t Dados do Cliente \n");
-							printf("Nome: %c \n", cadastro_cliente.nome);
+							printf("Nome: %s \n", cadastro_cliente.nome);
+							fprintf( fp, "Nome: %s \n", cadastro_cliente.nome);
+							fflush(stdin);
 							printf("Data de Nascimento: %d/%d/%d \n",cadastro_cliente.data_dia, cadastro_cliente.data_mes, cadastro_cliente.data_ano);
+							fprintf( fp, "Data de Nascimento: %d/%d/%d \n", cadastro_cliente.data_dia, cadastro_cliente.data_mes, cadastro_cliente.data_ano);
+							fflush(stdin);
 							printf("Idade: %d \n", conta_idade);
-							printf("RG: %d \n",cadastro_cliente.rg);
+							fprintf( fp, "Idade: %d \n", conta_idade);
+							fclose(fp);
+							printf("\n-----------------------------------------------------------\n");
+							scanf("%c", &pausa_ticket);
 						break;	
 				case 2:
 					printf("Fim Programa");
 					controle_telainicial = 1;
+					exit(0);
 					break;
 				
 				default :
